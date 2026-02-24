@@ -9,7 +9,7 @@ const goBack = () => {
   if (window.history.length > 2) {
     router.back()
   } else {
-    router.push('/')
+    router.push('/dashboard')
   }
 }
 </script>

@@ -8,6 +8,16 @@ const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     {
+      path: '/',
+      name: 'Landing',
+      component: () => import('../views/Landing.vue'),
+      meta: { 
+        title: 'GameTrackr | Organize sua vida gamer',
+        hideThemeToggle: true,
+        hideFooter: true
+      }
+    },
+    {
       path: '/auth/login',
       name: 'login',
       component: LoginView,
@@ -49,7 +59,7 @@ const router = createRouter({
       meta: { title: 'Página Não Encontrada', hideThemeToggle: true }
     },
     {
-      path: '/',
+      path: '/dashboard',
       name: 'dashboard',
       component: () => import('../views/Dashboard.vue'),
       // Esta tag avisa que a rota precisa de login
@@ -69,7 +79,7 @@ router.beforeEach((to, from, next) => {
     next('/auth/login')
   } else if (to.name === 'login' && isAuthenticated) {
     // Se tentar ir pro login já estando logado, manda pro dashboard
-    next('/')
+    next('/dashboard')
   } else {
     // Caso contrário, deixa seguir normalmente
     next()

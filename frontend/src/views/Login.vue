@@ -31,7 +31,7 @@ const handleLogin = async () => {
     }
     console.log(remember.value ? 'salvou' : 'não salvou')
     console.log(localStorage.getItem('token'), sessionStorage.getItem('token'))
-    router.push('/')
+    router.push('/dashboard')
 
   } catch (error: any) {
     if (error.response) {

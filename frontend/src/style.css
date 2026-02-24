@@ -1,1 +1,196 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap');
 @import "tailwindcss";
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* 1. Valores das váriaveis personalizadas */
+/* :root para tema claro e .dark para tema escuro */
+:root { 
+  --background: hsl(210 20% 96%);
+  --foreground: hsl(220 20% 14%);
+
+  --background-gradient: hsl(210 20% 96%);
+  --foreground-gradient: hsl(210 18% 92%);
+
+  --muted: hsl(210 14% 92%);
+  --muted-foreground: hsl(215 12% 45%);
+
+  --accent: hsl(320 70% 55%);
+  --accent-foreground: hsl(0 0% 100%);
+
+  --card: hsl(0 0% 100%);
+  --card-foreground: hsl(220 20% 14%);
+
+  --primary: hsl(280 65% 55%);
+  --primary-foreground: hsl(0 0% 100%);
+
+  --destructive: hsl(0 72% 50%);
+  --destructive-foreground: hsl(0 0% 100%);
+
+  --success: hsl(142 60% 40%);
+  --success-foreground: hsl(0 0% 100%);
+  --warning: hsl(38 92% 50%);
+  --warning-foreground: hsl(0 0% 10%);
+  --info: hsl(280 65% 55%);
+  --info-foreground: hsl(0 0% 100%);
+
+  --border: hsl(214 14% 82%);
+
+  --sidebar-background: hsl(210 20% 94%);
+
+  /* LOVABLE */ 
+  /*
+
+  --popover: hsl(0 0% 100%);
+  --popover-foreground: hsl(220 20% 14%);
+
+  --secondary: hsl(210 16% 90%);
+  --secondary-foreground: hsl(220 16% 30%);
+
+  --input: hsl(214 14% 82%);
+  --ring: hsl(280 65% 55%);
+
+  --radius: 0.5rem;
+
+  --steam-dark: hsl(210 20% 94%);
+  --steam-card: hsl(0 0% 100%);
+  --steam-card-hover: hsl(210 16% 96%);
+  --steam-highlight: hsl(280 65% 55%);
+  --steam-green: hsl(142 60% 40%);
+  
+  --sidebar-foreground: hsl(220 16% 30%);
+  --sidebar-primary: hsl(280 65% 55%);
+  --sidebar-primary-foreground: hsl(0 0% 100%);
+  --sidebar-accent: hsl(210 16% 90%);
+  --sidebar-accent-foreground: hsl(220 16% 30%);
+  --sidebar-border: hsl(214 14% 82%);
+  --sidebar-ring: hsl(280 65% 55%); */
+}
+
+.dark {
+  --background: hsl(220 20% 10%);
+  --foreground: hsl(210 20% 92%);
+
+  --background-gradient: hsl(220 22% 7%);
+  --foreground-gradient: hsl(220 18% 14%);
+  
+  --muted: hsl(220 14% 16%);
+  --muted-foreground: hsl(215 12% 55%);
+  
+  --accent: hsl(320 70% 65%);
+  --accent-foreground: hsl(220 20% 8%);
+
+  --card: hsl(220 18% 13%);
+  --card-foreground: hsl(210 20% 92%);
+  
+  --primary: hsl(280 65% 68%);
+  --primary-foreground: hsl(220 20% 8%);
+
+  --destructive: hsl(0 72% 55%);
+  --destructive-foreground: hsl(210 40% 98%);
+
+  --success: hsl(142 60% 45%);
+  --success-foreground: hsl(0 0% 100%);
+  --warning: hsl(38 92% 55%);
+  --warning-foreground: hsl(0 0% 10%);
+  --info: hsl(280 65% 68%);
+  --info-foreground: hsl(220 20% 8%);
+
+  --border: hsl(220 14% 20%);
+  
+  --sidebar-background: hsl(220 22% 7%);
+
+
+  /* LOVABLE */ 
+  /*
+  --popover: hsl(220 18% 13%);
+  --popover-foreground: hsl(210 20% 92%);
+
+  --secondary: hsl(220 16% 18%);
+  --secondary-foreground: hsl(210 20% 85%);
+
+  --input: hsl(220 14% 20%);
+  --ring: hsl(280 65% 68%);
+
+  --radius: 0.5rem;
+
+  --steam-dark: hsl(220 22% 7%);
+  --steam-card: hsl(220 18% 13%);
+  --steam-card-hover: hsl(220 16% 17%);
+  --steam-highlight: hsl(280 65% 68%);
+  --steam-green: hsl(142 60% 45%);
+
+  --sidebar-foreground: hsl(210 20% 85%);
+  --sidebar-primary: hsl(280 65% 68%);
+  --sidebar-primary-foreground: hsl(220 20% 8%);
+  --sidebar-accent: hsl(220 16% 18%);
+  --sidebar-accent-foreground: hsl(210 20% 85%);
+  --sidebar-border: hsl(220 14% 20%);
+  --sidebar-ring: hsl(280 65% 68%); */
+}
+
+/* 2. Mostrando ao tailwind como utilizar as variáveis personalizadas */
+@theme {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+
+  --color-gradient-start: var(--background-gradient);
+  --color-gradient-end: var(--foreground-gradient);
+
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-warning: var(--warning);
+  --color-warning-foreground: var(--warning-foreground);
+  --color-info: var(--info);
+  --color-info-foreground: var(--info-foreground);
+
+  --color-border: var(--border);
+}
+
+/* 3. Estilos globais nas tags html */
+@layer base {
+* {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+  }
+
+  ::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: hsl(var(--sidebar-background));
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: hsl(var(--border));
+    border-radius: 4px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: hsl(var(--muted-foreground));
+  }
+}
+
+/* 4. Criando classes personalizadas */
+@layer utilities {
+  .glass-card {
+      @apply bg-card/80 backdrop-blur-sm border border-border/50 transition-colors duration-300;
+  }
+}

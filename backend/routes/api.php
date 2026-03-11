@@ -3,25 +3,14 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
-use App\Http\Controllers\Api\GameController;
 
 Route::post('/login', [AuthController::class, 'login']);
+Route::post('/register', [AuthController::class, 'register']);
+Route::post('/email/verify', [AuthController::class, 'verifyEmail']);
+Route::post('/reset-password', [AuthController::class, 'resetPassword']);
+Route::post('/forgot-password', [AuthController::class, 'forgotPassword']);
+Route::post('/email/resend', [AuthController::class, 'resendVerificationEmail']);
 
 Route::middleware('auth:sanctum')->group(function () {
-    Route::get('/user', function(Request $request) {
-        return $request->user();
-    });
-
-    Route::get('/', function(Request $request) {
-        return response()->json([
-            'status' => 'success',
-            'data' => [
-                'title' => 'FOI',
-                'message' => 'VAMBORA'
-            ]
-        ]);
-    });
-
-
     Route::post('/logout', [AuthController::class, 'logout']);
 });

@@ -36,6 +36,22 @@ const router = createRouter({
       meta: { requiresAuth: false, title: 'Recuperar Senha' }
     },
     {
+      path: '/auth/verify',
+      name: 'verify-email',
+      component: () => import('../views/VerifyEmail.vue'),
+      meta: { 
+        title: 'Verificando E-mail',
+        hideThemeToggle: true, // Podemos esconder o botão global de tema para focar no Card
+        hideFooter: true
+      }
+    },
+    {
+      path: '/auth/reset-password',
+      name: 'reset-password',
+      component: () => import('../views/ResetPassword.vue'),
+      meta: { requiresAuth: false, title: 'Redefinir Senha' }
+    },
+    {
       path: '/logout',
       name: 'logout',
       component: LoginView,

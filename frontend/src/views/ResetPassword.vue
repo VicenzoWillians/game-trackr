@@ -1,23 +1,36 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
-import api from '../services/axios'
-import { useRouter } from 'vue-router'
-import { Gamepad2, User as UserIcon, Mail, Lock, LoaderCircle, Eye, EyeOff } from 'lucide-vue-next'
+import { ref, onMounted, computed } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+import { Gamepad2, Lock, Eye, EyeOff, LoaderCircle } from 'lucide-vue-next'
 import { useToast } from '../composables/useToast'
+import api from '../services/axios'
 
+const route = useRoute()
 const router = useRouter()
 const { show: toast } = useToast()
 
-const name = ref('')
-const email = ref('')
 const password = ref('')
 const passwordConfirmation = ref('')
-
-const isLoading = ref(false)
 const showPassword = ref(false)
 const showConfirmPassword = ref(false)
+const isLoading = ref(false)
 
-const disableCreateAccount = computed(() => {
+// Variáveis para guardar os dados da URL
+const token = ref('')
+const email = ref('')
+
+onMounted(() => {
+  // Pega os parâmetros que o Laravel mandou no link do e-mail
+  token.value = route.query.token as string
+  email.value = route.query.email as string
+
+  if (!token.value || !email.value) {
+    toast('Oops! Encontramos um problema.', 'Link de recuperação inválido ou incompleto.', 'error')
+    router.push('/auth/login')
+  }
+})
+
+const disableResetPassword = computed(() => {
   if (!password.value || !passwordConfirmation.value) {
     return true
   }
@@ -26,63 +39,37 @@ const disableCreateAccount = computed(() => {
     return true
   }
 
-  return !name.value || !email.value
+  return false
 })
 
-const HandleRegister = async () => {
+const handleResetPassword = async () => {
   if (password.value !== passwordConfirmation.value) {
-    toast(
-      'Oops! Encontramos um problema.', 
-      'As senhas não conferem.', 
-      'error'
-    )
-    return
-  }
-
-  if (password.value.length < 8) {
-    toast(
-      'Oops! Encontramos um problema.', 
-      'A senha deve ter no mínimo 8 caracteres.', 
-      'error'
-    )
+    toast('Oops! Encontramos um problema.', 'As senhas não coincidem.', 'error')
     return
   }
 
   isLoading.value = true
-
   try {
-    const response = await api.post('/register', {
-      name: name.value,
+    const response = await api.post('/reset-password', {
+      token: token.value,
       email: email.value,
       password: password.value,
       password_confirmation: passwordConfirmation.value
     })
     
-    toast(
-      response.data.title,
-      response.data.message, 
-      response.data.status
-    )
+    toast(response.data.title, response.data.message, response.data.status)
     router.push('/auth/login')
-
+    
   } catch (error: any) {
-    if (error.response && error.response.status === 422) {
-      const errors = error.response.data.errors
-      const firstErrorField = Object.keys(errors)[0]
-      const firstErrorMessage = firstErrorField ? errors[firstErrorField][0] : null
+    const errors = error.response?.data?.errors
+    const firstErrorField = Object.keys(errors)[0]
+    const firstErrorMessage = firstErrorField ? errors[firstErrorField][0] : null
 
-      toast(
-        'Oops! Encontramos um problema.',
-        firstErrorMessage || 'Ocorreu um erro ao tentar criar a conta. Por favor, tente novamente mais tarde.',
-        'error'
-      )
-    } else {
-      toast(
-        'Oops! Encontramos um problema.',
-        'Ocorreu um erro ao tentar criar a conta. Por favor, tente novamente mais tarde.',
-        'error'
-      )
-    }
+    toast(
+      'Oops! Encontramos um problema.',
+      firstErrorMessage || error.response?.data?.message,
+      'error'
+    )
 
   } finally {
     isLoading.value = false
@@ -93,7 +80,6 @@ const HandleRegister = async () => {
 <template>
   <div class="min-h-screen flex items-center justify-center transition-colors duration-300 
     bg-gradient-to-b from-gradient-start to-gradient-end">
-
     <div class="rounded-lg border shadow-sm glass-card border-border/50
       bg-card text-card-foreground transition-colors duration-300
       w-full max-w-md">
@@ -106,53 +92,17 @@ const HandleRegister = async () => {
         </div>
 
         <div>
-          <h3 class="font-semibold tracking-tight text-2xl transition-colors duration-300"> Criar uma conta </h3>
-          <p class="text-sm text-muted-foreground mt-1 transition-colors duration-300"> Comece a organizar sua jornada gamer </p>
+          <h3 class="font-semibold tracking-tight text-2xl transition-colors duration-300"> Criar nova senha </h3>
+          <p class="text-sm text-muted-foreground mt-1 transition-colors duration-300"> Escolha uma senha forte para a sua conta. </p>
         </div>
       </div>
 
       <div class="p-6 pt-0">
-        <form class="space-y-4" @submit.prevent="HandleRegister">
-          <div class="space-y-2">
-            <label for="name" class="text-sm font-medium leading-none 
-              peer-disabled:cursor-not-allowed peer-disabled:opacity-70"> 
-              Username / Nickname
-            </label> 
-
-            <div class="mt-1 relative">
-              <UserIcon class="absolute left-3 top-3 h-4 w-4 text-muted-foreground transition-colors duration-300" />
-              <input type="text" id="name" name="name" v-model="name" placeholder="Como quer ser chamado?" 
-                required :disabled="isLoading" 
-                class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-base
-                ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground
-                focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2
-                disabled:cursor-not-allowed disabled:opacity-50 transition-colors duration-300
-                placeholder:text-muted-foreground md:text-sm pl-9" />
-            </div>
-          </div>
-
-          <div class="space-y-2">
-            <label for="email" class="text-sm font-medium leading-none 
-              peer-disabled:cursor-not-allowed peer-disabled:opacity-70"> 
-              Email 
-            </label> 
-
-            <div class="mt-1 relative">
-              <Mail class="absolute left-3 top-3 h-4 w-4 text-muted-foreground transition-colors duration-300" />
-              <input type="email" id="email" name="email" v-model="email" placeholder="seu@email.com" 
-                required :disabled="isLoading" 
-                class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-base
-                ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground
-                focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2
-                disabled:cursor-not-allowed disabled:opacity-50 transition-colors duration-300
-                placeholder:text-muted-foreground md:text-sm pl-9" />
-            </div>
-          </div>
-
+        <form class="space-y-4" @submit.prevent="handleResetPassword">
           <div class="space-y-2">
             <label for="password" class="text-sm font-medium leading-none 
               peer-disabled:cursor-not-allowed peer-disabled:opacity-70"> 
-              Senha 
+              Nova senha 
             </label>
 
             <div class="mt-1 relative">
@@ -175,7 +125,7 @@ const HandleRegister = async () => {
           <div class="space-y-2">
             <label for="password_confirmation" class="text-sm font-medium leading-none 
               peer-disabled:cursor-not-allowed peer-disabled:opacity-70"> 
-              Confirmar senha 
+              Confirmar nova senha 
             </label>
 
             <div class="mt-1 relative">
@@ -195,19 +145,15 @@ const HandleRegister = async () => {
             </div>
           </div>
 
-          <button type="submit" :disabled="isLoading || disableCreateAccount"
-            class="inline-flex items-center justify-center gap-2 whitespace-nowrap h-10 px-4 py-2 w-full
-            rounded-md text-sm font-medium ring-offset-background transition-colors duration-300
+          <button type="submit" :disabled="isLoading || disableResetPassword" class="inline-flex items-center justify-center gap-2 whitespace-nowrap 
+            h-10 px-4 py-2 w-full rounded-md text-sm font-medium ring-offset-background transition-colors duration-300
             focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2
             disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground 
             hover:bg-primary/90">
-            <LoaderCircle v-if="isLoading" class="animate-spin" /> Cadastrar
+            <LoaderCircle v-if="isLoading" class="animate-spin" />
+            {{ isLoading ? 'Salvando...' : 'Redefinir senha' }}
           </button>
         </form>
-
-        <div class="mt-4 text-center text-sm text-muted-foreground transition-colors duration-300">
-          Já tem uma conta? <router-link to="/auth/login" class="text-primary hover:underline font-medium">Entrar</router-link>
-        </div>
       </div>
     </div>
   </div>

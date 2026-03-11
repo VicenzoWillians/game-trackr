@@ -4,17 +4,20 @@ import api from '../services/axios'
 import { useRouter } from 'vue-router'
 import { Gamepad2, Mail, Lock, LoaderCircle, Eye, EyeOff } from 'lucide-vue-next'
 import { useToast } from '../composables/useToast'
-const { show: toast } = useToast()
 
 const router = useRouter()
+const { show: toast } = useToast()
 
 const email = ref('')
 const password = ref('')
 const remember = ref(false)
 const isLoading = ref(false)
+const isResending = ref(false)
 const showPassword = ref(false)
+const needsVerification = ref(false)
 
 const handleLogin = async () => {
+  needsVerification.value = false
   isLoading.value = true
 
   try {
@@ -29,25 +32,17 @@ const handleLogin = async () => {
     } else {
       sessionStorage.setItem('token', token)
     }
-    console.log(remember.value ? 'salvou' : 'não salvou')
-    console.log(localStorage.getItem('token'), sessionStorage.getItem('token'))
     router.push('/dashboard')
 
   } catch (error: any) {
     if (error.response) {
-      if (error.response.status === 401 || error.response.status === 422) {
-        toast(
-          'Oops! Encontramos um problema.', 
-          'Credenciais inválidas. Por favor, verifique os campos e tente novamente.', 
-          'error'
-        )
-      } else if (error.response.status === 429) {
-        toast (
-          'Oops! Encontramos um problema.',
-          error.response.data.message,
-          'error'
-        )
-      }
+      needsVerification.value = error.response?.status === 403 && error.response?.data?.needs_verification
+
+      toast(
+        error.response.data.title,
+        error.response.data.message, 
+        error.response.data.status
+      )
     } else {
       toast(
         'Oops! Encontramos um problema.', 
@@ -58,6 +53,21 @@ const handleLogin = async () => {
 
   } finally {
     isLoading.value = false
+  }
+}
+
+const resendEmail = async () => {
+  if (!email.value) return
+  isResending.value = true
+
+  try {
+    const response = await api.post('/email/resend', { email: email.value })
+    toast(response.data.title, response.data.message, response.data.status)
+
+  } catch (error: any) {
+    toast(error.response.data.title, error.response.data.message, error.response.data.status)
+  } finally {
+    isResending.value = false
   }
 }
 </script>
@@ -151,6 +161,19 @@ const handleLogin = async () => {
             hover:bg-primary/90">
             <LoaderCircle v-if="isLoading" class="animate-spin" /> Entrar
           </button>
+
+          <div v-if="needsVerification" class="mt-4 p-4 rounded-xl bg-warning/10 border border-warning/20
+            text-center animate-in fade-in slide-in-from-top-2">
+            <p class="text-sm text-foreground mb-3">
+              Não recebeu o link ou o e-mail expirou?
+            </p>
+            <button type="button" @click="resendEmail" :disabled="isResending" class="w-full inline-flex justify-center 
+              items-center gap-2 py-2 px-4 border border-warning/30 rounded-md text-sm font-medium text-warning 
+              hover:bg-warning/10 transition-colors disabled:opacity-50">
+                <Mail class="h-4 w-4" />
+              {{isResending ? 'Reenviando...' : 'Reenviar e-mail agora'}}
+            </button>
+          </div>
         </form>
 
         <div class="mt-4 text-center text-sm text-muted-foreground transition-colors duration-300">
